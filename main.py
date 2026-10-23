@@ -1,4 +1,5 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse
 from drivers.evdev_driver import EvdevDriver
 
 
@@ -7,7 +8,7 @@ driver = EvdevDriver()
 
 @app.get("/")
 async def home():
-    return {"Status" : "OK"}
+    return FileResponse("static/index.html")
 
 
 

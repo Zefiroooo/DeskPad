@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeskPad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="touchpad" class="w-screen h-screen bg-slate-300"></div>
+
+    <script>
+        
+        // window.location.host otomatis membaca IP dan Port laptop tempat halaman web ini dibuka
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+        const pad = document.getElementById('touchpad');
+
+        pad.addEventListener('touchstart', (e) => {
+            lastX = e.touches[0].clientX
+            lastY = e.touches[0].clientY
+        });
+
+        pad.addEventListener('touchmove', (e) => {
+            e.preventDefault()
+
+            const currentX = e.touches[0].clientX
+            const currentY = e.touches[0].clientY
+
+            const dx = currentX - lastX
+            const dy = currentY - lastY
+
+            lastX = currentX
+            lastY = currentY
+
+            if (socket.readyState == WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: "move",
+                    dx : Math.round(dx),
+                    dy : Math.round(dy)
+                }));
+            }
+
+        })
+
+    </script>
+</body>
+</html>
