@@ -20,6 +20,9 @@ async def websocket_endpoint(websocket: WebSocket):
             data: dict = await websocket.receive_json()
             if data.get("type") == "move" :
                 driver.move(data.get("dx", 0), data.get("dy", 0))
+            elif data.get("type") == "scroll":
+                driver.scroll(data.get("dy"))
+
     except WebSocketDisconnect:
         print("Layanan websocket dihentikan")
 

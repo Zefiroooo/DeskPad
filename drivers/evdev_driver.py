@@ -18,9 +18,12 @@ class EvdevDriver(BaseInputController):
         self.ui.syn()
 
     def scroll(self, dy):
+        self.ui.write(ecodes.EV_REL, ecodes.REL_WHEEL, int(dy))
+        self.ui.syn()
         pass
 
     def click(self, button):
+        
         pass
 
     def close(self):

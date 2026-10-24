@@ -34,23 +34,35 @@
 
         pad.addEventListener('touchmove', (e) => {
             e.preventDefault()
-
+            
             const currentX = e.touches[0].clientX
             const currentY = e.touches[0].clientY
+            
+            if (e.touches.length === 1) {
+    
+                const dx = currentX - lastX
+                const dy = currentY - lastY
+    
+                lastX = currentX
+                lastY = currentY
+    
+                if (socket.readyState == WebSocket.OPEN) {
+    
+                    socket.send(JSON.stringify({
+                        type: "move",
+                        dx : Math.round(dx),
+                        dy : Math.round(dy)
+                    }));
+                }
+            } else if (e.touches.length === 2) {
+                const dy = currentY - lastY
+                lastY = currentY
 
-            const dx = currentX - lastX
-            const dy = currentY - lastY
-
-            lastX = currentX
-            lastY = currentY
-
-            if (socket.readyState == WebSocket.OPEN) {
-
+                if(socket.readyState == WebSocket.OPEN)
                 socket.send(JSON.stringify({
-                    type: "move",
-                    dx : Math.round(dx),
+                    type : "scroll",
                     dy : Math.round(dy)
-                }));
+            }))
             }
 
         })
