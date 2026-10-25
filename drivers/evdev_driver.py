@@ -20,11 +20,23 @@ class EvdevDriver(BaseInputController):
     def scroll(self, dy):
         self.ui.write(ecodes.EV_REL, ecodes.REL_WHEEL, int(dy))
         self.ui.syn()
-        pass
 
-    def click(self, button):
-        
-        pass
+    def click(self, button, action: str = "click"):
+        if button == "right":
+            if action == "down":
+                self.ui.write(ecodes.EV_KEY, ecodes.BTN_RIGHT, 1)
+                self.ui.syn()
+            elif action == "up":
+                self.ui.write(ecodes.EV_KEY, ecodes.BTN_RIGHT, 0)
+                self.ui.syn()
+
+        elif button == "left":
+            if action == "down":
+                self.ui.write(ecodes.EV_KEY, ecodes.BTN_LEFT, 1)
+                self.ui.syn()
+            elif action == "up":
+                self.ui.write(ecodes.EV_KEY, ecodes.BTN_LEFT, 0)
+                self.ui.syn()
 
     def close(self):
         self.ui.close()

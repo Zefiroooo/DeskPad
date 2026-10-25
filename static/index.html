@@ -26,6 +26,8 @@
         const socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
 
         const pad = document.getElementById('touchpad');
+        const left_button = document.getElementById('left-click');
+        const right_button = document.getElementById('right-click');
 
         pad.addEventListener('touchstart', (e) => {
             lastX = e.touches[0].clientX
@@ -38,7 +40,7 @@
             const currentX = e.touches[0].clientX
             const currentY = e.touches[0].clientY
             
-            if (e.touches.length === 1) {
+            if (e.targetTouches.length === 1) {
     
                 const dx = currentX - lastX
                 const dy = currentY - lastY
@@ -54,7 +56,7 @@
                         dy : Math.round(dy)
                     }));
                 }
-            } else if (e.touches.length === 2) {
+            } else if (e.targetTouches.length === 2) {
                 const dy = currentY - lastY
                 lastY = currentY
 
@@ -64,8 +66,58 @@
                     dy : Math.round(dy)
             }))
             }
-
         })
+
+        left_button.addEventListener('touchstart', (e) => {
+            e.preventDefault()
+
+            if(socket.readyState == WebSocket.OPEN)
+                socket.send(JSON.stringify({
+                type : "click",
+                button : "left",
+                action : "down"
+            }))
+        })
+
+        const leftButtonRelease = (e) => {
+            e.preventDefault()
+
+            if(socket.readyState == WebSocket.OPEN)
+                socket.send(JSON.stringify({
+                type : "click",
+                button : "left",
+                action : "up"
+            }))
+        }
+
+        left_button.addEventListener('touchend', leftButtonRelease)
+        left_button.addEventListener('touchcancel', leftButtonRelease)
+
+
+        right_button.addEventListener('touchstart', (e) => {
+            e.preventDefault()
+
+            if(socket.readyState == WebSocket.OPEN)
+            socket.send(JSON.stringify({
+                type : "click",
+                button : "right",
+                action : "down"
+            }))
+        })
+
+        const rightButtonRelease = (e) => {
+            e.preventDefault()
+
+            if(socket.readyState == WebSocket.OPEN)
+                socket.send(JSON.stringify({
+                type : "click",
+                button : "right",
+                action : "up"
+            }))
+        }
+
+        right_button.addEventListener('touchend', rightButtonRelease)
+        right_button.addEventListener('touchcancel', rightButtonRelease)
 
     </script>
 </body>
