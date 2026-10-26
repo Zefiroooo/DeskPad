@@ -7,7 +7,10 @@ class EvdevDriver(BaseInputController):
     def __init__(self):
         capabilities = {
             ecodes.EV_REL: [ecodes.REL_X, ecodes.REL_Y, ecodes.REL_WHEEL],
-            ecodes.EV_KEY: [ecodes.BTN_LEFT, ecodes.BTN_RIGHT]
+            ecodes.EV_KEY: [
+                ecodes.BTN_LEFT, ecodes.BTN_RIGHT, ecodes.KEY_LEFT, ecodes.KEY_RIGHT, ecodes.KEY_ESC,
+                ecodes.KEY_LEFTALT, ecodes.KEY_LEFTCTRL, ecodes.KEY_P, ecodes.KEY_F5
+            ]
         }
 
         self.ui = UInput(capabilities, "Virtual Mouse")
@@ -37,6 +40,7 @@ class EvdevDriver(BaseInputController):
             elif action == "up":
                 self.ui.write(ecodes.EV_KEY, ecodes.BTN_LEFT, 0)
                 self.ui.syn()
+    
 
     def close(self):
         self.ui.close()

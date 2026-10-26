@@ -9,25 +9,94 @@
 <body class="bg-slate-200 h-screen w-screen p-4 overflow-hidden">
     <div class="flex flex-col h-full w-full gap-4">
         <span class="text-lg text-center text-slate-700 font-bold rounded bg-slate-100 p-2 ">DeskPad</span>
-        <div id="touchpad" class="flex flex-1 rounded-3xl bg-white justify-center"></div>
-        <div>
-            <div class="flex h-28 gap-4">
-                <button id="left-click" class="flex-1 bg-white rounded font-medium font-semibold hover:bg-slate-300">left click</button>
-                <button id="right-click" class="flex-1 bg-white rounded font-medium font-semibold hover:bg-slate-300">right click</button>
-            </div>
-
+        
+        <div class="flex rounded-xl bg-white gap-4">
+            <button id="touchpad-switch" class="flex-1 p-2 text-sm font-semibold text-slate-800 rounded-xl flex justify-center items-center bg-slate-100">
+                <span>🖱️</span>
+                <span class=" ">Touchpad</span>
+            </button>
+            <button id="presenter-switch" class="flex-1 p-2 text-sm font-semibold text-slate-800 rounded-xl flex justify-center items-center bg-slate-100">
+                <span>📽️</span>
+                <span class=" ">Presenter</span>
+            </button>
         </div>
+        
+        <!-- TouchPad Mode -->
+        <div id="touchpad-mode" class="flex flex-col flex-1 gap-4 hidden">
+            <div id="touchpad" class="flex flex-1 rounded-3xl bg-white justify-center"></div>
+            <div>
+                <div class="flex h-28 gap-4">
+                    <button id="left-click" class="flex-1 bg-white rounded font-medium font-semibold hover:bg-slate-300">left click</button>
+                    <button id="right-click" class="flex-1 bg-white rounded font-medium font-semibold hover:bg-slate-300">right click</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Presenter Mode -->
+        <!-- Presenter Mode (flex flex-col flex-1 gap-4) -->
+        <div id="presenter-mode" class="flex flex-col flex-1 gap-4">
+            <!-- 1. Tombol Utama (Prev & Next) -> Mengisi seluruh ruang tengah layar (flex-1) -->
+            <div class="flex flex-1 gap-4">
+                <button class="flex-1 bg-white rounded-3xl shadow-sm flex flex-col items-center justify-center font-bold text-slate-700 text-xl active:bg-slate-200 transition-colors">
+                    <span class="text-3xl mb-1">⬅️</span>
+                    <span>Prev</span>
+                </button>
+                <button class="flex-1 bg-white rounded-3xl shadow-sm flex flex-col items-center justify-center font-bold text-slate-700 text-xl active:bg-slate-200 transition-colors">
+                    <span class="text-3xl mb-1">➡️</span>
+                    <span>Next</span>
+                </button>
+            </div>
+            <!-- 2. Tombol Bawah (Start & Stop) -> Tinggi proporsional h-24 -->
+            <div class="flex h-24 gap-4">
+                <button class="flex-1 bg-white rounded-2xl shadow-sm flex items-center justify-center font-bold text-slate-700 active:bg-slate-200 transition-colors">
+                    ▶️ Start
+                </button>
+                <button class="flex-1 bg-white rounded-2xl shadow-sm flex items-center justify-center font-bold text-rose-600 active:bg-slate-200 transition-colors">
+                    ❌ Stop (Esc)
+                </button>
+            </div>
+        </div>
+
+
     </div>
 
+
     <script>
-        
+        // Switch
+        const touchpad_switch = document.getElementById('touchpad-switch');
+        const presenter_switch = document.getElementById('presenter-switch');
+        const touchpad_mode = document.getElementById('touchpad-mode');
+        const presenter_mode = document.getElementById('presenter-mode')
+
         // window.location.host otomatis membaca IP dan Port laptop tempat halaman web ini dibuka
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
 
+        // Touchpad
         const pad = document.getElementById('touchpad');
+
+        // Click
         const left_button = document.getElementById('left-click');
         const right_button = document.getElementById('right-click');
+
+        // Function
+        touchpad_switch.addEventListener('click', (e) =>{
+            touchpad_switch.classList.remove('bg-slate-100');
+            presenter_switch.classList.add('bg-slate-100');
+
+            touchpad_mode.classList.remove('hidden');
+            presenter_mode.classList.add('hidden');
+        })
+
+        presenter_switch.addEventListener('click', (e) =>{
+            touchpad_switch.classList.add('bg-slate-100');
+            presenter_switch.classList.remove('bg-slate-100');
+
+            touchpad_mode.classList.add('hidden');
+            presenter_mode.classList.remove('hidden');
+        })
+
+
 
         pad.addEventListener('touchstart', (e) => {
             lastX = e.touches[0].clientX
