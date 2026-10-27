@@ -11,6 +11,16 @@ class EvdevDriver(BaseInputController):
                 ecodes.BTN_LEFT, ecodes.BTN_RIGHT, ecodes.KEY_LEFT, ecodes.KEY_RIGHT, ecodes.KEY_ESC,
                 ecodes.KEY_LEFTALT, ecodes.KEY_LEFTCTRL, ecodes.KEY_P, ecodes.KEY_F5
             ]
+            }
+        
+        self.KEY_MAPPING : dict = {
+            "next" : [ecodes.KEY_RIGHT],
+            "prev" : [ecodes.KEY_LEFT],
+            "exit" : [ecodes.KEY_ESC],
+            "black": [ecodes.KEY_B],
+
+            "start_ppt" : [ecodes.KEY_F5],
+            "start_canva" : [ecodes.KEY_LEFTCTRL, ecodes.KEY_LEFTALT, ecodes.KEY_P]
         }
 
         self.ui = UInput(capabilities, "Virtual Mouse")
@@ -40,6 +50,19 @@ class EvdevDriver(BaseInputController):
             elif action == "up":
                 self.ui.write(ecodes.EV_KEY, ecodes.BTN_LEFT, 0)
                 self.ui.syn()
+
+
+    def key_press(self, key_name: str):
+        keys = self.KEY_MAPPING.get(key_name)
+        if not keys : return
+
+        for k in keys:
+            self.ui.write(ecodes.EV_KEY, k, 1)
+        self.ui.syn()
+
+        for k in keys:
+            self.ui.write(ecodes.EV_KEY, k, 0)
+        self.ui.syn()
     
 
     def close(self):

@@ -24,6 +24,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 driver.scroll(data.get("dy", 0))
             elif data.get("type") == "click":
                 driver.click(data.get("button"), data.get("action"))
+            elif data.get("type") == "key":
+                driver.key_press(data.get("key_name"))
 
 
     except WebSocketDisconnect:
