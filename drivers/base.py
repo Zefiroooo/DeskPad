@@ -17,6 +17,11 @@ class BaseInputController(ABC):
         pass
 
     @abstractmethod
+    def key_press(self, key_name: str):
+        # Untuk Key
+        pass
+
+    @abstractmethod
     def close(self):
         # Melepas Koneksi
         pass
