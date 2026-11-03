@@ -10,12 +10,18 @@
     <div class="flex flex-col h-full w-full gap-4">
         <span class="text-lg text-center text-slate-700 font-bold rounded bg-slate-100 p-2 ">DeskPad</span>
         
+        <!-- Voice Status Banner -->
+        <div id="voice-feedback" class="hidden px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl text-xs font-medium text-center transition-all flex items-center justify-center gap-1.5 shadow-sm">
+            <span id="voice-feedback-icon">🎙️</span>
+            <span id="voice-feedback-text">Mendengarkan...</span>
+        </div>
+        
         <div class="flex rounded-xl bg-white gap-4">
-            <button id="touchpad-switch" class="flex-1 p-2 text-sm font-semibold text-slate-800 rounded-xl flex justify-center items-center">
+            <button id="touchpad-switch" class="flex-1 p-2 text-sm font-semibold text-slate-800 rounded-xl flex justify-center items-center bg-slate-100">
                 <span>🖱️</span>
                 <span class=" ">Touchpad</span>
             </button>
-            <button id="presenter-switch" class="flex-1 p-2 text-sm font-semibold text-slate-800 rounded-xl flex justify-center items-center bg-slate-100">
+            <button id="presenter-switch" class="flex-1 p-2 text-sm font-semibold text-slate-800 rounded-xl flex justify-center items-center ">
                 <span>📽️</span>
                 <span class=" ">Presenter</span>
             </button>
@@ -60,6 +66,10 @@
                 <button id="blank-button" class="flex-1 bg-white rounded-2xl shadow-sm flex items-center justify-center font-bold text-slate-700 active:bg-slate-200 transition-colors">
                     ⬛ Blank Screen
                 </button>
+                <button id="voice-button" class="flex-1 bg-white rounded-2xl shadow-sm flex items-center justify-center font-bold text-indigo-600 active:bg-slate-200 transition-all select-none">
+                    <span id="voice-icon" class="mr-1.5 text-xl">🎙️</span>
+                    <span id="voice-label">Kontrol Suara</span>
+                </button>
             </div>
         </div>
 
@@ -67,156 +77,8 @@
     </div>
 
 
-    <script>
-        // Switch
-        const touchpad_switch = document.getElementById('touchpad-switch');
-        const presenter_switch = document.getElementById('presenter-switch');
-        const touchpad_mode = document.getElementById('touchpad-mode');
-        const presenter_mode = document.getElementById('presenter-mode')
-
-        // window.location.host otomatis membaca IP dan Port laptop tempat halaman web ini dibuka
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
-
-        // Touchpad
-        const pad = document.getElementById('touchpad');
-
-        // Click
-        const left_button = document.getElementById('left-click');
-        const right_button = document.getElementById('right-click');
-
-        // Keys
-        const prev = document.getElementById("prev-button");
-        const next = document.getElementById("next-button");
-        const start = document.getElementById("start-button");
-        const exit = document.getElementById("exit-button");
-        const blank = document.getElementById("blank-button");
-
-        // Function
-        touchpad_switch.addEventListener('click', (e) =>{
-            touchpad_switch.classList.remove('bg-slate-100');
-            presenter_switch.classList.add('bg-slate-100');
-
-            touchpad_mode.classList.remove('hidden');
-            presenter_mode.classList.add('hidden');
-        })
-
-        presenter_switch.addEventListener('click', (e) =>{
-            touchpad_switch.classList.add('bg-slate-100');
-            presenter_switch.classList.remove('bg-slate-100');
-
-            touchpad_mode.classList.add('hidden');
-            presenter_mode.classList.remove('hidden');
-        })
-
-
-
-        pad.addEventListener('touchstart', (e) => {
-            lastX = e.touches[0].clientX
-            lastY = e.touches[0].clientY
-        });
-
-        pad.addEventListener('touchmove', (e) => {
-            e.preventDefault()
-            
-            const currentX = e.touches[0].clientX
-            const currentY = e.touches[0].clientY
-            
-            if (e.targetTouches.length === 1) {
-    
-                const dx = currentX - lastX
-                const dy = currentY - lastY
-    
-                lastX = currentX
-                lastY = currentY
-    
-                if (socket.readyState == WebSocket.OPEN) {
-    
-                    socket.send(JSON.stringify({
-                        type: "move",
-                        dx : Math.round(dx),
-                        dy : Math.round(dy)
-                    }));
-                }
-            } else if (e.targetTouches.length === 2) {
-                const dy = currentY - lastY
-                lastY = currentY
-
-                if(socket.readyState == WebSocket.OPEN)
-                socket.send(JSON.stringify({
-                    type : "scroll",
-                    dy : Math.round(dy)
-            }))
-            }
-        })
-
-        left_button.addEventListener('touchstart', (e) => {
-            e.preventDefault()
-
-            if(socket.readyState == WebSocket.OPEN)
-                socket.send(JSON.stringify({
-                type : "click",
-                button : "left",
-                action : "down"
-            }))
-        })
-
-        const leftButtonRelease = (e) => {
-            e.preventDefault()
-
-            if(socket.readyState == WebSocket.OPEN)
-                socket.send(JSON.stringify({
-                type : "click",
-                button : "left",
-                action : "up"
-            }))
-        }
-
-        left_button.addEventListener('touchend', leftButtonRelease)
-        left_button.addEventListener('touchcancel', leftButtonRelease)
-
-
-        right_button.addEventListener('touchstart', (e) => {
-            e.preventDefault()
-
-            if(socket.readyState == WebSocket.OPEN)
-            socket.send(JSON.stringify({
-                type : "click",
-                button : "right",
-                action : "down"
-            }))
-        })
-
-        const rightButtonRelease = (e) => {
-            e.preventDefault()
-
-            if(socket.readyState == WebSocket.OPEN)
-                socket.send(JSON.stringify({
-                type : "click",
-                button : "right",
-                action : "up"
-            }))
-        }
-
-        right_button.addEventListener('touchend', rightButtonRelease)
-        right_button.addEventListener('touchcancel', rightButtonRelease)
-
-        function sendKey(key_name) {
-            if (socket.readyState == WebSocket.OPEN){
-                socket.send(JSON.stringify({
-                    type : "key",
-                    key_name : key_name
-                }))
-            }
-        }
-
-        prev.addEventListener("click", () => sendKey("prev"));
-        next.addEventListener("click", () => sendKey("next"));
-        start.addEventListener("click", () => sendKey("start_canva"));
-        exit.addEventListener("click", () => sendKey("exit"));
-        blank.addEventListener("click", () => sendKey("black"))
-
-
+    <script src="/static/app.js">
+      
     </script>
 </body>
 </html>
