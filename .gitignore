@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+drivers/__pycache__/
+venv/
+GEMINI.md
+touch_visualization.html
